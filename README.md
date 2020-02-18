@@ -1,5 +1,5 @@
 # cs4750Project
-link to crime dataset: https://catalog.data.gov/dataset/nypd-arrests-data-historic
+link to crime dataset: https://data.cityofnewyork.us/api/views/8h9b-rp9u/rows.csv?accessType=DOWNLOAD
 
 link to airline dataset: https://raw.githubusercontent.com/fivethirtyeight/data/master/airline-safety/airline-safety.csv
 
