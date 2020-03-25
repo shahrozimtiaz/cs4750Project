@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `cs4750project`
+-- Database: `project`
 --
 
 -- --------------------------------------------------------
@@ -74,4 +74,4 @@ INSERT INTO `query_history_crime`(`User_ID`, `Query_ID`, `Date_Time`, `ArrestID`
 ("3895", 0002, NULL, 2948563),
 ("3095", 0003, NULL, 5693837),
 ("2906", 0004, NULL, 2832300),
-("5693", 0005, NULL), 384371);
+("5693", 0005, NULL, 384371);
