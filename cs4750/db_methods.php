@@ -2,14 +2,16 @@
 <?php 
 function login($username,$password){
    global $db;
-   $query = "select * from user where User_Name=:username and Password=:password";
+   $query = "select Password from user where User_Name=:username";
    $statement = $db->prepare($query);
    $statement->bindValue(':username', $username);
-   $statement->bindValue(':password', $password);
    $statement->execute();
    $results = $statement->fetch();
    $statement->closecursor();
-   return $results;
+   if(!$results){
+      return FALSE;
+   }
+   return password_verify($password,$results['Password']);
 }
 
 function signup($username,$password){
@@ -17,7 +19,7 @@ function signup($username,$password){
    $query = "insert into user(User_Name, Password) values (:username,:password)";
    $statement = $db->prepare($query);
    $statement->bindValue(':username', $username);
-   $statement->bindValue(':password', $password);
+   $statement->bindValue(':password', password_hash($password,PASSWORD_DEFAULT));
    if ($statement->execute()){
       $results = TRUE;
    }else{
