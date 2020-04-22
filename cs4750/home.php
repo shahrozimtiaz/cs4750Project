@@ -7,6 +7,7 @@ require('db_methods.php');
 <?php
     $airline_query_set = getAirlines();
     $airbnb_query_set = getAirbnb();
+
     $crime_query_set = getCrime();
     $selected="Airline";
     if (isset($_POST['table'])){
@@ -89,7 +90,7 @@ require('db_methods.php');
         </select>
         <br>
         <label>Listing ID</label>
-        <input type="text" class="form-control" name="airbnbHostName" value="any" onfocus="this.value=''" required>
+        <input type="text" class="form-control" name="airbnbListingName" value="any" onfocus="this.value=''" required>
         <br>
         <label>Location</label>
         <input type="text" class="form-control" name="airbnbLocation" value="any" onfocus="this.value=''" required>
@@ -197,12 +198,64 @@ require('db_methods.php');
 <div id="airbnbResults" style="overflow:scroll;display:none">
     <table class="table table-striped table-bordered">
         <tr>
+            <?php if(isset($airbnb_query_set[0]['Listing_ID'])){ ?>
+                <th>Listing Id </th>
+            <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Location'])){ ?>
+                <th>Location</th>
+            <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Rating'])){ ?>
+                <th>Rating (out of 100) </th>
+            <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Price'])){ ?>
+                <th>Price</th>
+            <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Bed_type'])){ ?>
+                <th>Bed Type</th>
+            <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Amenity'])){ ?>
+                <th>Amenities</th>
+            <?php } ?>
             <th>Host ID</th>
             <th>Host Name</th>
             <th>Verified</th>
+           
+            
         </tr>      
         <?php foreach ($airbnb_query_set as $row): ?>
         <tr>
+        <?php if(isset($row['Listing_ID'])){ ?>
+            <td>
+               <?php echo $row['Listing_ID']; ?> 
+            </td>
+            <?php } ?>
+        
+            <?php if(isset($row['Location'])){?>
+            <td>
+                <?php echo $row['Location']; ?> 
+            </td> 
+            <?php } ?> 
+            <?php if(isset($row['Rating'])){?>
+            <td>
+                <?php echo $row['Rating']; ?> 
+            </td> 
+            <?php } ?> 
+            <?php if(isset($row['Price'])){?>
+            <td>
+                <?php echo $row['Price']; ?> 
+            </td> 
+            <?php } ?> 
+            <?php if(isset($row['Bed_type'])){?>
+            <td>
+                <?php echo $row['Bed_type']; ?> 
+            </td> 
+            <?php } ?> 
+            <?php if(isset($row['Amenity'])){?>
+            <td>
+                <?php echo $row['Amenity']; ?> 
+            </td> 
+            <?php } ?>
+             
             <td>
             <?php echo $row['Host_ID']; ?> 
             </td>  
@@ -211,7 +264,7 @@ require('db_methods.php');
             </td>  
             <td>
             <?php echo $row['Is_verified']; ?> 
-            </td>                            
+            </td>                
         </tr>
         <?php endforeach; ?>
     </table>

@@ -68,8 +68,102 @@ function getAirlines(){
 
 function getAirbnb(){
    global $db;
-   $query = "select * from airbnbhost";
+   $query = "select * from airbnbhost ";
+   if (isset($_POST['airbnbListingName']) && $_POST['airbnbListingName']!='any') {
+      $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      $params[] = 'Listing_ID=:listing_id';
+   }
+   if (isset($_POST['airbnbLocation']) && $_POST['airbnbLocation']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      }
+      $params[] = "Location LIKE CONCAT( '%', :location, '%' )";
+   }
+   if (isset($_POST['airbnbAmenities']) && $_POST['airbnbAmenities']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
+         $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
+      }else{
+         $query.=" JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
+         $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
+      }
+   }
+   if (isset($_POST['airbnbRating']) && $_POST['airbnbRating']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      }
+      $params[] = 'Rating >= :rating';
+   }
+   if (isset($_POST['airbnbPrice']) && $_POST['airbnbPrice']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      }
+      $params[] = 'Price <= :price';
+   }
+   if (isset($_POST['airbnbBedType']) && $_POST['airbnbBedType']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      }
+      $params[] = "Bed_type LIKE CONCAT( '%', :bedtype, '%' )";
+   }
+   if (isset($_POST['airbnbHostID']) && $_POST['airbnbHostID']!='any') {
+     if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == true){
+         $params[] = 'airbnbhost.Host_ID=:hostid';
+      }else{
+         $params[] = 'Host_ID=:hostid';
+      }
+   }
+   if (isset($_POST['airbnbHostName']) && $_POST['airbnbHostName']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == true){
+          $params[] = "airbnbhost.First_name LIKE CONCAT( '%', :hostname, '%' ) ";
+       }else{
+          $params[] = "First_name LIKE CONCAT( '%', :hostname, '%' )";
+       }
+    }
+   if (isset($_POST['airbnbHostVerification']) && $_POST['airbnbHostVerification']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == true){
+          $params[] = 'airbnbhost.Is_verified=:verified';
+       }else{
+          $params[] = 'Is_verified=:verified';
+       }
+    }
+   if (!empty($params)) {
+      $query .= ' where ' . implode(' AND ', $params);
+   }
    $statement = $db->prepare($query);
+   if (isset($_POST['airbnbListingName']) && $_POST['airbnbListingName']!='any') {
+      $statement->bindValue(':listing_id', $_POST['airbnbListingName']);
+   }
+   if (isset($_POST['airbnbLocation']) && $_POST['airbnbLocation']!='any') {
+      $statement->bindValue(':location', $_POST['airbnbLocation']);
+   }
+   if (isset($_POST['airbnbPrice']) && $_POST['airbnbPrice']!='any') {
+      $statement->bindValue(':price', $_POST['airbnbPrice']);
+   }
+   if (isset($_POST['airbnbBedType']) && $_POST['airbnbBedType']!='any') {
+      $statement->bindValue(':bedtype', $_POST['airbnbBedType']);
+   }
+   if (isset($_POST['airbnbHostID']) && $_POST['airbnbHostID']!='any') {
+      $statement->bindValue(':hostid', $_POST['airbnbHostID']);
+   }
+   if (isset($_POST['airbnbHostName']) && $_POST['airbnbHostName']!='any') {
+      $statement->bindValue(':hostname', $_POST['airbnbHostName']);
+   }
+   if (isset($_POST['airbnbRating']) && $_POST['airbnbRating']!='any') {
+      $statement->bindValue(':rating', $_POST['airbnbRating']);
+   }
+   if (isset($_POST['airbnbAmenities']) && $_POST['airbnbAmenities']!='any') {
+      $statement->bindValue(':amenity', $_POST['airbnbAmenities']);
+   }
+   if (isset($_POST['airbnbHostVerification']) && $_POST['airbnbHostVerification']!='any') {
+      if($_POST['airbnbHostVerification']=='T'){
+         $statement->bindValue(':verified','1');
+      }elseif($_POST['airbnbHostVerification']=='F'){
+         $statement->bindValue(':verified','0');
+      }else{
+         $statement->bindValue(':verified', $_POST['airbnbHostVerification']);
+      }
+   }
    $statement->execute();
    $results = $statement->fetchAll();
    $statement->closecursor();
