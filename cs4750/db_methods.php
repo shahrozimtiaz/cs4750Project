@@ -106,6 +106,12 @@ function getAirbnb(){
       }
       $params[] = "Bed_type LIKE CONCAT( '%', :bedtype, '%' )";
    }
+   if (isset($_POST['airbnbRoomType']) && $_POST['airbnbRoomType']!='any') {
+      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      }
+      $params[] = "Room_type LIKE CONCAT( '%', :roomtype, '%' )";
+   }
    if (isset($_POST['airbnbHostID']) && $_POST['airbnbHostID']!='any') {
      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == true){
          $params[] = 'airbnbhost.Host_ID=:hostid';
@@ -142,6 +148,9 @@ function getAirbnb(){
    }
    if (isset($_POST['airbnbBedType']) && $_POST['airbnbBedType']!='any') {
       $statement->bindValue(':bedtype', $_POST['airbnbBedType']);
+   }
+   if (isset($_POST['airbnbRoomType']) && $_POST['airbnbRoomType']!='any') {
+      $statement->bindValue(':roomtype', $_POST['airbnbRoomType']);
    }
    if (isset($_POST['airbnbHostID']) && $_POST['airbnbHostID']!='any') {
       $statement->bindValue(':hostid', $_POST['airbnbHostID']);

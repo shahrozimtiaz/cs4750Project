@@ -213,6 +213,9 @@ require('db_methods.php');
             <?php if(isset($airbnb_query_set[0]['Bed_type'])){ ?>
                 <th>Bed Type</th>
             <?php } ?>
+            <?php if(isset($airbnb_query_set[0]['Room_type'])){ ?>
+                <th>Room Type</th>
+            <?php } ?>
             <?php if(isset($airbnb_query_set[0]['Amenity'])){ ?>
                 <th>Amenities</th>
             <?php } ?>
@@ -248,6 +251,11 @@ require('db_methods.php');
             <?php if(isset($row['Bed_type'])){?>
             <td>
                 <?php echo $row['Bed_type']; ?> 
+            </td> 
+            <?php } ?> 
+            <?php if(isset($row['Room_type'])){?>
+            <td>
+                <?php echo $row['Room_type']; ?> 
             </td> 
             <?php } ?> 
             <?php if(isset($row['Amenity'])){?>
