@@ -36,13 +36,31 @@ function getAirlines(){
       $params[] = 'Name=:name';
    }
    if (isset($_POST['airlineIncidents']) && $_POST['airlineIncidents']!='any') {
-      $params[] = 'Incidents=:incidents';
+       if (strpos($_POST['airlineIncidents'], '>') !== false) {
+           $params[] = 'Incidents > :incidents';
+       } else if (strpos($_POST['airlineIncidents'], '<') !==false) {
+           $params[] = 'Incidents < :incidents';
+       } else {
+           $params[] = 'Incidents=:incidents';
+       }
    }
    if (isset($_POST['airlineFatalAccidents']) && $_POST['airlineFatalAccidents']!='any') {
-      $params[] = 'Fatal_Accidents=:fatalAccidents';
+       if (strpos($_POST['airlineFatalAccidents'], '>') !== false) {
+           $params[] = 'Fatal_Accidents > :fatalAccidents';
+       } else if (strpos($_POST['airlineFatalAccidents'], '<') !==false) {
+           $params[] = 'Fatal_Accidents < :fatalAccidents';
+       } else {
+           $params[] = 'Fatal_Accidents=:fatalAccidents';
+       }
    }
    if (isset($_POST['airlineFatalities']) && $_POST['airlineFatalities']!='any') {
-      $params[] = 'Fatalities=:fatalities';
+       if (strpos($_POST['airlineFatalities'], '>') !== false) {
+           $params[] = 'Fatalities > :fatalities';
+       } else if (strpos($_POST['airlineFatalities'], '<') !==false) {
+           $params[] = 'Fatalities < :fatalities';
+       } else {
+           $params[] = 'Fatalities=:fatalities';
+       }
    }
    if (!empty($params)) {
       $query .= ' where ' . implode(' AND ', $params);
@@ -52,14 +70,14 @@ function getAirlines(){
       $statement->bindValue(':name', $_POST['airlineName']);
    }
    if (isset($_POST['airlineIncidents']) && $_POST['airlineIncidents']!='any') {
-      $statement->bindValue(':incidents', $_POST['airlineIncidents']);
+       $statement->bindValue('incidents', trim($_POST['airlineIncidents'], '<> '));
    }  
    if (isset($_POST['airlineFatalAccidents']) && $_POST['airlineFatalAccidents']!='any') {
-      $statement->bindValue(':fatalAccidents', $_POST['airlineFatalAccidents']);
+      $statement->bindValue(':fatalAccidents', trim($_POST['airlineFatalAccidents'], "<> "));
    } 
    if (isset($_POST['airlineFatalities']) && $_POST['airlineFatalities']!='any') {
-      $statement->bindValue(':fatalities', $_POST['airlineFatalities']);
-   } 
+      $statement->bindValue(':fatalities', trim($_POST['airlineFatalities'], '<> '));
+   }
    $statement->execute();
    $results = $statement->fetchAll();
    $statement->closecursor();
@@ -180,12 +198,51 @@ function getAirbnb(){
 }
 
 function getCrime(){
-   global $db;
-   $query = "select * from arrest";
-   $statement = $db->prepare($query);
-   $statement->execute();
-   $results = $statement->fetchAll();
-   $statement->closecursor();
-   return $results;
+    global $db;
+    $query = "select * from arrest ";
+    if (isset($_POST['arrestID']) && $_POST['arrestID'] != 'any') {
+        $params[] = 'ArrestID=:arrestID';
+    }
+    if (isset($_POST['arrestDate']) && $_POST['arrestDate'] != '') {
+        $params[] = 'Date=:arrestDate';
+    }
+    if (isset($_POST['arrestType']) && $_POST['arrestType'] != 'any') {
+        $params[] = "Type LIKE CONCAT('%', :arrestType, '%')";
+    }
+    if (isset($_POST['arrestGender']) && $_POST['arrestGender'] != 'any') {
+        $params[] = "Gender=:arrestGender";
+    }
+    if (isset($_POST['arrestAgeGroup']) && $_POST['arrestAgeGroup'] != 'any') {
+        $params[] = "Age_Group=:arrestAgeGroup";
+    }
+    if (isset($_POST['arrestRace']) && $_POST['arrestRace'] != 'any') {
+        $params[] = "Race=:arrestRace";
+    }
+    if (!empty($params)) {
+        $query .= ' WHERE ' . implode(' AND ', $params);
+    }
+    $statement = $db->prepare($query);
+    if (isset($_POST['arrestID']) && $_POST['arrestID'] != 'any') {
+        $statement->bindValue('arrestID', $_POST['arrestID']);
+    }
+    if (isset($_POST['arrestDate']) && $_POST['arrestDate'] != '') {
+        $statement->bindValue('arrestDate', $_POST['arrestDate']);
+    }
+    if (isset($_POST['arrestType']) && $_POST['arrestType'] != 'any') {
+        $statement->bindValue('arrestType', $_POST['arrestType']);
+    }
+    if (isset($_POST['arrestGender']) && $_POST['arrestGender'] != 'any') {
+        $statement->bindValue('arrestGender', $_POST['arrestGender']);
+    }
+    if (isset($_POST['arrestAgeGroup']) && $_POST['arrestAgeGroup'] != 'any') {
+        $statement->bindValue('arrestAgeGroup', $_POST['arrestAgeGroup']);
+    }
+    if (isset($_POST['arrestRace']) && $_POST['arrestRace'] != 'any') {
+        $statement->bindValue('arrestRace', $_POST['arrestRace']);
+    }
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closecursor();
+    return $results;
 }
 ?>
