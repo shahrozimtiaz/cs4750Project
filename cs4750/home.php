@@ -7,6 +7,7 @@ require('db_methods.php');
 <?php
     $airline_query_set = getAirlines();
     $airbnb_query_set = getAirbnb();
+
     $crime_query_set = getCrime();
     $airline_history_set = getAirlineHistory();
     $airbnb_history_set = getAirbnbHistory();
