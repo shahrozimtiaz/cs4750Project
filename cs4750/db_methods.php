@@ -1,5 +1,5 @@
 <!-- functions for querying db -->
-<?php 
+<?php
 function login($username,$password){
    global $db;
    $query = "select Password from user where User_Name=:username";
@@ -71,16 +71,35 @@ function getAirlines(){
    }
    if (isset($_POST['airlineIncidents']) && $_POST['airlineIncidents']!='any') {
        $statement->bindValue('incidents', trim($_POST['airlineIncidents'], '<> '));
-   }  
+   }
    if (isset($_POST['airlineFatalAccidents']) && $_POST['airlineFatalAccidents']!='any') {
       $statement->bindValue(':fatalAccidents', trim($_POST['airlineFatalAccidents'], "<> "));
-   } 
+   }
    if (isset($_POST['airlineFatalities']) && $_POST['airlineFatalities']!='any') {
       $statement->bindValue(':fatalities', trim($_POST['airlineFatalities'], '<> '));
    }
+
    $statement->execute();
    $results = $statement->fetchAll();
    $statement->closecursor();
+
+   if ($query != "select * from airline") {
+     // Inserting into query_history table
+     $user_id = $_SESSION['loggedin'];
+     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+     $statement = $db->prepare($query1);
+     $statement->execute();
+
+     // Inserting into query_history_airline
+     foreach ($results as $result) {
+       $name = $result['Name'];
+       $query = "INSERT INTO `query_history_airline` (`User_ID`, `Query_ID`, `Date_Time`, `Name`)
+       VALUES ('$user_id', NULL, current_timestamp(), '$name')";
+       $statement = $db->prepare($query);
+       $statement->execute();
+     }
+   }
+
    return $results;
 }
 
@@ -110,13 +129,29 @@ function getAirbnb(){
       if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
          $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
       }
-      $params[] = 'Rating >= :rating';
+      if (strpos($_POST['airbnbRating'], '>') !== false) {
+        $params[] = 'airbnblist.Rating > :rating';
+      } else if (strpos($_POST['airbnbRating'], '<') !== false) {
+        $params[] = 'airbnblist.Rating < :rating';
+      } else {
+        $params[] = 'airbnblist.Rating = :rating';
+      }
+      
    }
    if (isset($_POST['airbnbPrice']) && $_POST['airbnbPrice']!='any') {
-      if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
-         $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
-      }
-      $params[] = 'Price <= :price';
+    if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
+      $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+    }
+    if (strpos($_POST['airbnbPrice'], '>') !== false) {
+      $params[] = 'airbnblist.Price > : price';
+    }else if (strpos($_POST['airbnbPrice'], '<') !== false) {
+      $params[] = 'airbnblist.Price < :price';
+    }else {
+      $params[] = 'Price = :price';
+    }
+    
+     
+     
    }
    if (isset($_POST['airbnbBedType']) && $_POST['airbnbBedType']!='any') {
       if(strpos($query,'JOIN airbnblist ON airbnbhost.Host_Id') == false){
@@ -162,7 +197,7 @@ function getAirbnb(){
       $statement->bindValue(':location', $_POST['airbnbLocation']);
    }
    if (isset($_POST['airbnbPrice']) && $_POST['airbnbPrice']!='any') {
-      $statement->bindValue(':price', $_POST['airbnbPrice']);
+      $statement->bindValue(':price', trim($_POST['airbnbPrice'], '<> '));
    }
    if (isset($_POST['airbnbBedType']) && $_POST['airbnbBedType']!='any') {
       $statement->bindValue(':bedtype', $_POST['airbnbBedType']);
@@ -177,7 +212,7 @@ function getAirbnb(){
       $statement->bindValue(':hostname', $_POST['airbnbHostName']);
    }
    if (isset($_POST['airbnbRating']) && $_POST['airbnbRating']!='any') {
-      $statement->bindValue(':rating', $_POST['airbnbRating']);
+      $statement->bindValue(':rating', trim($_POST['airbnbRating'], '<> '));
    }
    if (isset($_POST['airbnbAmenities']) && $_POST['airbnbAmenities']!='any') {
       $statement->bindValue(':amenity', $_POST['airbnbAmenities']);
@@ -194,6 +229,44 @@ function getAirbnb(){
    $statement->execute();
    $results = $statement->fetchAll();
    $statement->closecursor();
+
+   if ($query != "select * from airbnbhost ") {
+     // Inserting into query_history table
+     $user_id = $_SESSION['loggedin'];
+     $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+     $statement = $db->prepare($query);
+     $statement->execute();
+     $statement->closecursor();
+
+     // Inserting into query_history_airbnb and query_history_airbnb_amenities tables
+     foreach ($results as $result) {
+       $host_id = $result['Host_ID'];
+       if(isset($result['Listing_ID'])) {
+         $listing_id = $result['Listing_ID'];
+         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
+         VALUES ('$user_id', NULL, current_timestamp(), '$host_id', '$listing_id')";
+         $statement = $db->prepare($query);
+         $statement->execute();
+         $statement->closecursor();
+         if (isset($result['Amenity'])) {
+           $amenity = substr($result['Amenity'], 0, 255);
+           $query = "INSERT INTO `query_history_airbnb_amenities` (`User_ID`, `Query_ID`, `Listing_ID`, `Amenity`)
+           VALUES ('$user_id', NULL, '$listing_id', '$amenity')";
+           $statement = $db->prepare($query);
+           $statement->execute();
+           $statement->closecursor();
+         }
+       }
+       else {
+         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
+         VALUES ('$user_id', NULL, current_timestamp(), '$host_id', NULL)";
+         $statement = $db->prepare($query);
+         $statement->execute();
+         $statement->closecursor();
+       }
+     }
+   }
+
    return $results;
 }
 
@@ -243,80 +316,57 @@ function getCrime(){
     $statement->execute();
     $results = $statement->fetchAll();
     $statement->closecursor();
+
+    if ($query != "select * from arrest ") {
+      // Inserting into query_history table
+      $user_id = $_SESSION['loggedin'];
+      $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+      $statement = $db->prepare($query);
+      $statement->execute();
+
+      // Inserting into query_history_crime table
+      foreach ($results as $result) {
+        $arrest_id = $result['ArrestID'];
+        $query = "INSERT INTO `query_history_crime` (`User_ID`, `Query_ID`, `Date_Time`, `ArrestID`) VALUES ('$user_id', NULL, current_timestamp(), ' $arrest_id')";
+        $statement = $db->prepare($query);
+        $statement->execute();
+      }
+    }
+
     return $results;
 }
 
-function getReviews(){
-   global $db;
-   $query = "select * from review order by Date desc";
-   $statement = $db->prepare($query);
-   $statement->execute();
-   $results = $statement->fetchAll();
-   $statement->closecursor();
-   return $results;
+function getAirlineHistory() {
+  global $db;
+  $user_id = $_SESSION['loggedin'];
+  $query = "SELECT * FROM `query_history_airline` WHERE `query_history_airline`.`User_ID` = '$user_id';";
+  $statement = $db->prepare($query);
+  $statement->execute();
+  $results = $statement->fetchAll();
+  $statement->closecursor();
+  return $results;
 }
 
-function createReview($username,$title,$text,$rating){
-   global $db;
-   $query = "insert into review(User_Name,Rating,Title,Text) values (:username,:rating,:title,:text)";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':username', $username);
-   $statement->bindValue(':title', $title);
-   $statement->bindValue(':text', $text);
-   $statement->bindValue(':rating', $rating);
-   if ($statement->execute()){
-      $results = TRUE;
-   }else{
-      $results = FALSE;
-   }
-   $statement->closecursor();
-   return $results;
+function getAirbnbHistory() {
+  global $db;
+  $user_id = $_SESSION['loggedin'];
+  $query = "SELECT * FROM `query_history_airbnb` WHERE `query_history_airbnb`.`User_ID` = '$user_id';";
+  $statement = $db->prepare($query);
+  $statement->execute();
+  $results = $statement->fetchAll();
+  $statement->closecursor();
+  return $results;
 }
 
-function getReview($id){
-   global $db;
-   $query = "select * from review where Review_ID=:id";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':id', $id);
-   if ($statement->execute()){
-      $results = $statement->fetch();
-   }else{
-      $results = FALSE;
-   }
-   $statement->closecursor();
-   return $results;
+function getCrimeHistory() {
+  global $db;
+  $user_id = $_SESSION['loggedin'];
+  $query = "SELECT * FROM `query_history_crime` WHERE `query_history_crime`.`User_ID` = '$user_id';";
+  $statement = $db->prepare($query);
+  $statement->execute();
+  $results = $statement->fetchAll();
+  $statement->closecursor();
+  return $results;
 }
 
-function updateReview($id,$username,$title,$text,$rating){
-   global $db;
-   echo $id;
-   $query = "update review set User_Name=:username, Rating=:rating, Title=:title, Text=:text where Review_ID=:id";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':id', $id);
-   $statement->bindValue(':username', $username);
-   $statement->bindValue(':title', $title);
-   $statement->bindValue(':text', $text);
-   $statement->bindValue(':rating', $rating);
-   if ($statement->execute()){
-      $results = TRUE;
-   }else{
-      $results = FALSE;
-   }
-   $statement->closecursor();
-   return $results;
-}
-
-function deleteReview($id){
-   global $db;
-   $query = "delete from review where Review_ID=:id";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':id', $id);
-   if ($statement->execute()){
-      $results = TRUE;
-   }else{
-      $results = FALSE;
-   }
-   $statement->closecursor();
-   return $results;
-}
 ?>
