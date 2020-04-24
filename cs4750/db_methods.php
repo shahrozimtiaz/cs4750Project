@@ -300,7 +300,7 @@ function getAirbnb(){
          }
        }
        else {
-         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
+         $query = "INSERT INTO `query_history_airbnb_amenities` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
          VALUES ('$user_id', '$max', current_timestamp(), '$host_id', NULL)";
          $statement = $db->prepare($query);
          $statement->execute();
