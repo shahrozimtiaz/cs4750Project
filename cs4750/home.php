@@ -161,7 +161,9 @@ require('db_methods.php');
   </div>
       <div class="form-group">
           <button type="submit" name="query" class="btn btn-success btn-block btn-lg" style="background: #00cb82;">Query</button>
-	     </div>
+          <br>
+          <br>
+	  </div>
   </form>
 </div>
 
