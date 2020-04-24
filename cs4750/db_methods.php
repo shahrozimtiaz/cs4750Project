@@ -84,17 +84,37 @@ function getAirlines(){
    $statement->closecursor();
 
    if ($query != "select * from airline") {
-     // Inserting into query_history table
+     // Find max Query_ID from query_history
      $user_id = $_SESSION['loggedin'];
-     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+     $query1 = "SELECT MAX(`Query_ID`) FROM `query_history`;";
      $statement = $db->prepare($query1);
      $statement->execute();
+     $results1 = $statement->fetchAll();
+     foreach ($results1 as $result) {
+       $max = $result['MAX(`Query_ID`)'];
+     }
+     $max++;
+
+     // Inserting into query_history table
+     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', '$max', current_timestamp())";
+     $statement = $db->prepare($query1);
+     $statement->execute();
+
+     // Find max Query_ID from query_history_airline
+     $query1 = "SELECT MAX(`Query_ID`) FROM `query_history_airline`;";
+     $statement = $db->prepare($query1);
+     $statement->execute();
+     $results1 = $statement->fetchAll();
+     foreach ($results1 as $result) {
+       $max = $result['MAX(`Query_ID`)'];
+     }
+     $max++;
 
      // Inserting into query_history_airline
      foreach ($results as $result) {
        $name = $result['Name'];
        $query = "INSERT INTO `query_history_airline` (`User_ID`, `Query_ID`, `Date_Time`, `Name`)
-       VALUES ('$user_id', NULL, current_timestamp(), '$name')";
+       VALUES ('$user_id', '$max', current_timestamp(), '$name')";
        $statement = $db->prepare($query);
        $statement->execute();
      }
@@ -231,12 +251,34 @@ function getAirbnb(){
    $statement->closecursor();
 
    if ($query != "select * from airbnbhost ") {
+     // Find max Query_ID from query_history
+     $user_id = $_SESSION['loggedin'];
+     $query1 = "SELECT MAX(`Query_ID`) FROM `query_history`;";
+     $statement = $db->prepare($query1);
+     $statement->execute();
+     $results1 = $statement->fetchAll();
+     foreach ($results1 as $result) {
+       $max = $result['MAX(`Query_ID`)'];
+     }
+     $max++;
+
      // Inserting into query_history table
      $user_id = $_SESSION['loggedin'];
-     $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+     $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', '$max', current_timestamp())";
      $statement = $db->prepare($query);
      $statement->execute();
      $statement->closecursor();
+
+
+     // Find max Query_ID from query_history_airbnb
+     $query1 = "SELECT MAX(`Query_ID`) FROM `query_history_airbnb`;";
+     $statement = $db->prepare($query1);
+     $statement->execute();
+     $results1 = $statement->fetchAll();
+     foreach ($results1 as $result) {
+       $max = $result['MAX(`Query_ID`)'];
+     }
+     $max++;
 
      // Inserting into query_history_airbnb and query_history_airbnb_amenities tables
      foreach ($results as $result) {
@@ -244,14 +286,14 @@ function getAirbnb(){
        if(isset($result['Listing_ID'])) {
          $listing_id = $result['Listing_ID'];
          $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
-         VALUES ('$user_id', NULL, current_timestamp(), '$host_id', '$listing_id')";
+         VALUES ('$user_id', '$max', current_timestamp(), '$host_id', '$listing_id')";
          $statement = $db->prepare($query);
          $statement->execute();
          $statement->closecursor();
          if (isset($result['Amenity'])) {
            $amenity = substr($result['Amenity'], 0, 255);
            $query = "INSERT INTO `query_history_airbnb_amenities` (`User_ID`, `Query_ID`, `Listing_ID`, `Amenity`)
-           VALUES ('$user_id', NULL, '$listing_id', '$amenity')";
+           VALUES ('$user_id', '$max', '$listing_id', '$amenity')";
            $statement = $db->prepare($query);
            $statement->execute();
            $statement->closecursor();
@@ -259,7 +301,7 @@ function getAirbnb(){
        }
        else {
          $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
-         VALUES ('$user_id', NULL, current_timestamp(), '$host_id', NULL)";
+         VALUES ('$user_id', '$max', current_timestamp(), '$host_id', NULL)";
          $statement = $db->prepare($query);
          $statement->execute();
          $statement->closecursor();
@@ -317,17 +359,40 @@ function getCrime(){
     $results = $statement->fetchAll();
     $statement->closecursor();
 
-    if ($query != "select * from arrest ") {
+      if ($query != "select * from arrest ") {
+      // Find max Query_ID from query_history
+      $user_id = $_SESSION['loggedin'];
+      $query1 = "SELECT MAX(`Query_ID`) FROM `query_history`;";
+      $statement = $db->prepare($query1);
+      $statement->execute();
+      $results1 = $statement->fetchAll();
+      foreach ($results1 as $result) {
+        $max = $result['MAX(`Query_ID`)'];
+      }
+      $max++;
+
       // Inserting into query_history table
       $user_id = $_SESSION['loggedin'];
-      $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', NULL, current_timestamp())";
+      $query = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Date_Time`) VALUES ('$user_id', '$max', current_timestamp())";
       $statement = $db->prepare($query);
       $statement->execute();
+
+
+      // Find max Query_ID from query_history_crime
+      $user_id = $_SESSION['loggedin'];
+      $query1 = "SELECT MAX(`Query_ID`) FROM `query_history_crime`;";
+      $statement = $db->prepare($query1);
+      $statement->execute();
+      $results1 = $statement->fetchAll();
+      foreach ($results1 as $result) {
+        $max = $result['MAX(`Query_ID`)'];
+      }
+      $max++;
 
       // Inserting into query_history_crime table
       foreach ($results as $result) {
         $arrest_id = $result['ArrestID'];
-        $query = "INSERT INTO `query_history_crime` (`User_ID`, `Query_ID`, `Date_Time`, `ArrestID`) VALUES ('$user_id', NULL, current_timestamp(), ' $arrest_id')";
+        $query = "INSERT INTO `query_history_crime` (`User_ID`, `Query_ID`, `Date_Time`, `ArrestID`) VALUES ('$user_id', '$max', current_timestamp(), ' $arrest_id')";
         $statement = $db->prepare($query);
         $statement->execute();
       }
