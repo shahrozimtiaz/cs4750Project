@@ -344,6 +344,7 @@ require('db_methods.php');
         <tr>
             <th>User Name</th>
             <th>Query ID</th>
+	    <th>Group ID</th>
             <th>Date</th>
             <th>Airline Name</th>
         </tr>
@@ -354,6 +355,9 @@ require('db_methods.php');
             </td>
             <td>
             <?php echo $row['Query_ID']; ?>
+            </td>
+            <td>
+              <?php echo $row['Group_ID']; ?>
             </td>
             <td>
             <?php echo $row['Date_Time']; ?>
@@ -380,6 +384,7 @@ require('db_methods.php');
         <tr>
             <th>User Name</th>
             <th>Query ID</th>
+	    <th>Group ID</th>
             <th>Date</th>
             <th>Host ID</th>
             <th>Listing ID</th>
@@ -391,6 +396,9 @@ require('db_methods.php');
             </td>
             <td>
             <?php echo $row['Query_ID']; ?>
+            </td>
+            <td>
+            <?php echo $row['Group_ID']; ?>
             </td>
             <td>
             <?php echo $row['Date_Time']; ?>
@@ -420,6 +428,7 @@ require('db_methods.php');
         <tr>
             <th>User Name</th>
             <th>Query ID</th>
+	    <th>Group ID</th>
             <th>Date</th>
             <th>Arrest ID</th>
         </tr>
@@ -430,6 +439,9 @@ require('db_methods.php');
             </td>
             <td>
             <?php echo $row['Query_ID']; ?>
+            </td>
+            <td>
+              <?php echo $row['Group_ID']; ?>
             </td>
             <td>
             <?php echo $row['Date_Time']; ?>
