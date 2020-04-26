@@ -1,7 +1,8 @@
 <!-- connecting to cs4750 db project -->
 <?php
 
-$username = 'root';
+$username = 'project_user';
+$password = 'cs4750';
 $host = 'localhost:3306';
 $dbname = 'project';
 
@@ -11,7 +12,7 @@ $db = "";
 
 try 
 {
-   $db = new PDO($dsn, $username);   
+   $db = new PDO($dsn, $username,$password);   
 }
 catch (PDOException $e)
 {

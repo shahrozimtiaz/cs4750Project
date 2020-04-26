@@ -96,13 +96,12 @@ function getAirlines(){
      $max++;
 
      // Inserting into query_history table
-     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`)
-     VALUES (:user, :query, :group, :time)";
+     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`)
+     VALUES (:user, :query, :group)";
      $statement = $db->prepare($query1);
      $statement->bindValue(':user', $user_id);
      $statement->bindValue(':group', $max);
      $statement->bindValue(':query', NULL);
-     $statement->bindValue(':time', current_timestamp());
      $statement->execute();
 
      // Find max Query_ID from query_history_airline
@@ -118,14 +117,13 @@ function getAirlines(){
      // Inserting into query_history_airline
      foreach ($results as $result) {
        $name = $result['Name'];
-       $query = "INSERT INTO `query_history_airline` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`, `Name`)
-       VALUES (:user, :query, :group, :time, :name)";
+       $query = "INSERT INTO `query_history_airline` (`User_ID`, `Query_ID`, `Group_ID`, `Name`)
+       VALUES (:user, :query, :group, :name)";
        $statement = $db->prepare($query);
        $statement->bindValue(':user', $user_id);
        $statement->bindValue(':group', $max);
        $statement->bindValue(':name', $name);
        $statement->bindValue(':query', NULL);
-       $statement->bindValue(':time', current_timestamp());
        $statement->execute();
      }
    }
@@ -273,13 +271,12 @@ function getAirbnb(){
 
 
      // Inserting into query_history table
-     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`)
-     VALUES (:user, :query, :group, :time)";
+     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`)
+     VALUES (:user, :query, :group)";
      $statement = $db->prepare($query1);
      $statement->bindValue(':user', $user_id);
      $statement->bindValue(':group', $max);
      $statement->bindValue(':query', NULL);
-     $statement->bindValue(':time', current_timestamp());
      $statement->execute();
 
 
@@ -298,15 +295,14 @@ function getAirbnb(){
        $host_id = $result['Host_ID'];
        if(isset($result['Listing_ID'])) {
          $listing_id = $result['Listing_ID'];
-         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
-         VALUES (:user, :query, :group, :time, :host, :listing)";
+         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Group_ID`, `Host_ID`, `Listing_ID`)
+         VALUES (:user, :query, :group, :host, :listing)";
          $statement = $db->prepare($query);
          $statement->bindValue(':user', $user_id);
          $statement->bindValue(':group', $max);
          $statement->bindValue(':host', $host_id);
          $statement->bindValue(':listing', $listing_id);
          $statement->bindValue(':query', NULL);
-         $statement->bindValue(':time', current_timestamp()); 
          $statement->execute();
          $statement->closecursor();
 
@@ -325,14 +321,13 @@ function getAirbnb(){
          }
        }
        else {
-         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`, `Host_ID`, `Listing_ID`)
-         VALUES (:user, :query, :group, :time, :host, :list)";
+         $query = "INSERT INTO `query_history_airbnb` (`User_ID`, `Query_ID`, `Group_ID`, `Host_ID`, `Listing_ID`)
+         VALUES (:user, :query, :group, :host, :list)";
          $statement = $db->prepare($query);
          $statement->bindValue(':user', $user_id);
          $statement->bindValue(':group', $max);
          $statement->bindValue(':host', $host_id);
          $statement->bindValue(':query', NULL);
-         $statement->bindValue(':time', current_timestamp());
          $statement->bindValue(':list', NULL);
          $statement->execute();
          $statement->closecursor();
@@ -403,13 +398,12 @@ function getCrime(){
       $max++;
 
      // Inserting into query_history table
-     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`)
-     VALUES (:user, :query, :group, :time)";
+     $query1 = "INSERT INTO `query_history` (`User_ID`, `Query_ID`, `Group_ID`)
+     VALUES (:user, :query, :group)";
      $statement = $db->prepare($query1);
      $statement->bindValue(':user', $user_id);
      $statement->bindValue(':group', $max);
      $statement->bindValue(':query', NULL);
-     $statement->bindValue(':time', current_timestamp());
      $statement->execute();
 
 
@@ -427,14 +421,13 @@ function getCrime(){
       // Inserting into query_history_crime table
       foreach ($results as $result) {
         $arrest_id = $result['ArrestID'];
-        $query = "INSERT INTO `query_history_crime` (`User_ID`, `Query_ID`, `Group_ID`, `Date_Time`, `ArrestID`)
-        VALUES (:user, :query, :group, :time, :arrest)";
+        $query = "INSERT INTO `query_history_crime` (`User_ID`, `Query_ID`, `Group_ID`, `ArrestID`)
+        VALUES (:user, :query, :group, :arrest)";
         $statement = $db->prepare($query);
         $statement->bindValue(':user', $user_id);
         $statement->bindValue(':group', $max);
         $statement->bindValue(':arrest', $arrest_id);
         $statement->bindValue(':query', NULL);
-        $statement->bindValue(':time', current_timestamp());
         $statement->execute();
       }
     }
@@ -445,8 +438,9 @@ function getCrime(){
 function getAirlineHistory() {
   global $db;
   $user_id = $_SESSION['loggedin'];
-  $query = "SELECT * FROM `query_history_airline` WHERE `query_history_airline`.`User_ID` = '$user_id';";
+  $query = "SELECT * FROM `query_history_airline` WHERE `query_history_airline`.`User_ID` = :user ORDER BY Group_ID DESC;";
   $statement = $db->prepare($query);
+  $statement->bindValue(':user', $user_id);
   $statement->execute();
   $results = $statement->fetchAll();
   $statement->closecursor();
@@ -456,8 +450,9 @@ function getAirlineHistory() {
 function getAirbnbHistory() {
   global $db;
   $user_id = $_SESSION['loggedin'];
-  $query = "SELECT * FROM `query_history_airbnb` WHERE `query_history_airbnb`.`User_ID` = '$user_id';";
+  $query = "SELECT * FROM `query_history_airbnb` WHERE `query_history_airbnb`.`User_ID` = :user ORDER BY Group_ID DESC;";
   $statement = $db->prepare($query);
+  $statement->bindValue(':user', $user_id);
   $statement->execute();
   $results = $statement->fetchAll();
   $statement->closecursor();
@@ -467,8 +462,9 @@ function getAirbnbHistory() {
 function getCrimeHistory() {
   global $db;
   $user_id = $_SESSION['loggedin'];
-  $query = "SELECT * FROM `query_history_crime` WHERE `query_history_crime`.`User_ID` = '$user_id';";
+  $query = "SELECT * FROM `query_history_crime` WHERE `query_history_crime`.`User_ID` = :user ORDER BY Group_ID DESC;";
   $statement = $db->prepare($query);
+  $statement->bindValue(':user', $user_id);
   $statement->execute();
   $results = $statement->fetchAll();
   $statement->closecursor();
