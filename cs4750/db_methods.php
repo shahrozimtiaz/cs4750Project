@@ -132,9 +132,9 @@ function getAirlines(){
 
 function getAirbnb(){
    global $db;
-   $query = "select * from airbnbhost ";
+   $query = "select * from airbnbhost JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
    if (isset($_POST['airbnbListingName']) && $_POST['airbnbListingName']!='any') {
-      $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      #$query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
       $params[] = 'Listing_ID=:listing_id';
    }
    if (isset($_POST['airbnbLocation']) && $_POST['airbnbLocation']!='any') {
@@ -148,7 +148,7 @@ function getAirbnb(){
          $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
          $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
       }else{
-         $query.=" JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
+         #$query.=" JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
          $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
       }
    }
