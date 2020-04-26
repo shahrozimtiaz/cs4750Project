@@ -23,6 +23,8 @@ if (isset($_GET['deleteReview'])) {
         exit;
     } else {
         $_SESSION['message'] = 'Invalid form';
+        header("Location: edit_review.php?reviewID=".$_GET['reviewID']);
+        exit;
     }
 }
 if (isset($_POST['reviewTitle'])) {
@@ -31,6 +33,8 @@ if (isset($_POST['reviewTitle'])) {
         exit;
     } else {
         $_SESSION['message'] = 'Invalid form';
+        header("Location: edit_review.php?reviewID=".$_GET['reviewID']);
+        exit;
     }
 }
 ?>

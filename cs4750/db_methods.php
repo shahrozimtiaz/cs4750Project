@@ -513,14 +513,13 @@ function getReview($id){
 
 function updateReview($id,$username,$title,$text,$rating){
    global $db;
-   echo $id;
    $query = "update review set User_Name=:username, Rating=:rating, Title=:title, Text=:text where Review_ID=:id";
    $statement = $db->prepare($query);
-   $statement->bindValue(':id', $id);
    $statement->bindValue(':username', $username);
+   $statement->bindValue(':rating', $rating);
    $statement->bindValue(':title', $title);
    $statement->bindValue(':text', $text);
-   $statement->bindValue(':rating', $rating);
+   $statement->bindValue(':id', $id);
    if ($statement->execute()){
       $results = TRUE;
    }else{
