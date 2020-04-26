@@ -206,6 +206,9 @@ require('db_methods.php');
 <div id="airbnbResults" style="overflow:scroll;display:none">
     <table class="table table-striped table-bordered">
         <tr>
+            <th>Host ID</th>
+            <th>Host Name</th>
+            <th>Verified</th>
             <?php if(isset($airbnb_query_set[0]['Listing_ID'])){ ?>
                 <th>Listing Id </th>
             <?php } ?>
@@ -227,15 +230,21 @@ require('db_methods.php');
             <?php if(isset($airbnb_query_set[0]['Amenity'])){ ?>
                 <th>Amenities</th>
             <?php } ?>
-            <th>Host ID</th>
-            <th>Host Name</th>
-            <th>Verified</th>
 
 
         </tr>
         <?php foreach ($airbnb_query_set as $row): ?>
         <tr>
-        <?php if(isset($row['Listing_ID'])){ ?>
+            <td>
+            <?php echo $row['Host_ID']; ?>
+            </td>
+            <td>
+            <?php echo $row['First_name']; ?>
+            </td>
+            <td>
+            <?php echo $row['Is_verified']; ?>
+            </td>
+            <?php if(isset($row['Listing_ID'])){ ?>
             <td>
                <?php echo $row['Listing_ID']; ?>
             </td>
@@ -271,16 +280,6 @@ require('db_methods.php');
                 <?php echo $row['Amenity']; ?>
             </td>
             <?php } ?>
-
-            <td>
-            <?php echo $row['Host_ID']; ?>
-            </td>
-            <td>
-            <?php echo $row['First_name']; ?>
-            </td>
-            <td>
-            <?php echo $row['Is_verified']; ?>
-            </td>
         </tr>
         <?php endforeach; ?>
     </table>
