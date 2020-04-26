@@ -132,9 +132,9 @@ function getAirlines(){
 
 function getAirbnb(){
    global $db;
-   $query = "select * from airbnbhost JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
+   $query = "select * from airbnbhost ";
    if (isset($_POST['airbnbListingName']) && $_POST['airbnbListingName']!='any') {
-      #$query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
+      $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id";
       $params[] = 'Listing_ID=:listing_id';
    }
    if (isset($_POST['airbnbLocation']) && $_POST['airbnbLocation']!='any') {
@@ -148,7 +148,7 @@ function getAirbnb(){
          $query.= "JOIN airbnblist ON airbnbhost.Host_Id = airbnblist.Host_Id JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
          $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
       }else{
-         #$query.=" JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
+         $query.=" JOIN airbnblisting_amenities ON airbnblist.Listing_ID = airbnblisting_amenities.Listing_ID ";
          $params[] = "Amenity LIKE CONCAT( '%', :amenity, '%' )";
       }
    }
@@ -543,32 +543,4 @@ function deleteReview($id){
    $statement->closecursor();
    return $results;
 }
-
-function getFollowups($reviewID){
-   global $db;
-   $query = "select * from followup where Review_ID=:reviewID order by Date";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':reviewID', $reviewID);
-   $statement->execute();
-   $results = $statement->fetchAll();
-   $statement->closecursor();
-   return $results;
-}
-
-function createFollowup($username,$reviewID,$text){
-   global $db;
-   $query = "insert into followup(User_Name,Review_ID,Text) values (:username,:reviewID,:text)";
-   $statement = $db->prepare($query);
-   $statement->bindValue(':username', $username);
-   $statement->bindValue(':reviewID', $reviewID);
-   $statement->bindValue(':text', $text);
-   if ($statement->execute()){
-      $results = TRUE;
-   }else{
-      $results = FALSE;
-   }
-   $statement->closecursor();
-   return $results;
-}
-
 ?>
