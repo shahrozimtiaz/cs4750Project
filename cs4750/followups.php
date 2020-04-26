@@ -5,7 +5,16 @@ require('db_methods.php');
 ?>
 
 <?php
-$reviews_query_set = getReviews();
+if (!isset($_GET['reviewID'])) {
+    header("Location: reviews.php");
+    exit;
+}
+$review= getReview($_GET['reviewID']);
+if(!$review){
+    header("Location: reviews.php");
+    exit;
+}
+$follow_ups_set = getFollowups($_GET['reviewID']);
 ?>
 
 
@@ -52,27 +61,42 @@ $reviews_query_set = getReviews();
     <br>
     <div class="container shadow p-3 mb-5 bg-white rounded" style="font-family: 'Merriweather', serif;">
         <div class="text-right">
-            <a class="btn btn-success btn-lg" href="leave_review.php" style="background: #00cb82;"><i class="fa fa-pencil"></i> Leave a Review</a>
+            <a class="btn btn-success btn-lg" href="leave_followup.php?reviewID=<?php echo $review['Review_ID'] ?>" style="background: #00cb82;"><i class="fa fa-pencil"></i> Leave a follow-up</a>
         </div>
         <br>
-        <?php foreach ($reviews_query_set as $row) : ?>
-            <div class="card shadow p-3 mb-5 bg-white rounded text-center mx-auto" style="width: 34rem">
+        <div class="card shadow p-3 mb-5 bg-white rounded text-center mx-auto" style="width: 54rem">
                 <h5 class="card-header">
-                    Rating: <?php echo $row['Rating']; ?>
-                    <?php if ($row['User_Name']==$_SESSION['loggedin']) : ?>
+                    Rating: <?php echo $review['Rating']; ?>
+                    <?php if ($review['User_Name']==$_SESSION['loggedin']) : ?>
                         <span class="text-right">
-                            <a class="close" href="edit_review.php?reviewID=<?php echo $row['Review_ID'] ?>"><i class="fa fa-pencil"></i></a>
+                            <a class="close" href="edit_review.php?reviewID=<?php echo $review['Review_ID'] ?>"><i class="fa fa-pencil"></i></a>
                         </span>
                     <?php endif; ?>
                 </h5>
                 <div class="card-body">
                     <h5 class="card-title">
-                        <?php echo strtoupper($row['Title']); ?>
+                        <?php echo strtoupper($review['Title']); ?>
                     </h5>
+                    <p class="card-text">
+                        <?php echo $review['Text']; ?>
+                    </p>
+                </div>
+                <div class="card-footer text-muted">
+                    <?php echo $review['User_Name']; ?>
+                    <?php echo substr($review['Date'], 0, 10); ?>
+                </div>
+            </div>
+        <br>
+        <?php foreach ($follow_ups_set as $row) : ?>
+            <div class="card shadow p-3 mb-5 bg-white rounded text-center mx-auto" style="width: 34rem">
+                <h5 class="card-header">
+                    Follow-up
+                </h5>
+                <div class="card-body">
                     <p class="card-text">
                         <?php echo $row['Text']; ?>
                     </p>
-                    <a href="followups.php?reviewID=<?php echo $row['Review_ID'] ?>" class="btn btn-success" style="background: #00cb82;">Follow up</a>
+                    <a href="#" class="btn btn-success" style="background: #00cb82;">Follow up</a>
                 </div>
                 <div class="card-footer text-muted">
                     <?php echo $row['User_Name']; ?>

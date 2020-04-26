@@ -543,4 +543,32 @@ function deleteReview($id){
    $statement->closecursor();
    return $results;
 }
+
+function getFollowups($reviewID){
+   global $db;
+   $query = "select * from followup where Review_ID=:reviewID order by Date";
+   $statement = $db->prepare($query);
+   $statement->bindValue(':reviewID', $reviewID);
+   $statement->execute();
+   $results = $statement->fetchAll();
+   $statement->closecursor();
+   return $results;
+}
+
+function createFollowup($username,$reviewID,$text){
+   global $db;
+   $query = "insert into followup(User_Name,Review_ID,Text) values (:username,:reviewID,:text)";
+   $statement = $db->prepare($query);
+   $statement->bindValue(':username', $username);
+   $statement->bindValue(':reviewID', $reviewID);
+   $statement->bindValue(':text', $text);
+   if ($statement->execute()){
+      $results = TRUE;
+   }else{
+      $results = FALSE;
+   }
+   $statement->closecursor();
+   return $results;
+}
+
 ?>

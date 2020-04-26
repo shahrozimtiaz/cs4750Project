@@ -5,9 +5,27 @@ require('db_methods.php');
 ?>
 
 <?php
-$reviews_query_set = getReviews();
+if (!isset($_GET['reviewID'])) {
+    header("Location: reviews.php");
+    exit;
+}
+$review= getReview($_GET['reviewID']);
+if(!$review){
+    header("Location: reviews.php");
+    exit;
+}
+if (isset($_POST['followupText'])){
+    if(createFollowup($_SESSION['loggedin'],$_GET['reviewID'],$_POST['followupText'])){
+        $dest = "Location: followups.php?reviewID=". $review['Review_ID'];
+        header($dest);
+    }else{
+        $_SESSION['message']='Invalid form';
+        $dest = "Location: leave_followup.php?reviewID=". $review['Review_ID'];
+        header($dest);
+        exit;
+    }
+}
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -50,36 +68,22 @@ $reviews_query_set = getReviews();
         </div>
     </nav>
     <br>
-    <div class="container shadow p-3 mb-5 bg-white rounded" style="font-family: 'Merriweather', serif;">
-        <div class="text-right">
-            <a class="btn btn-success btn-lg" href="leave_review.php" style="background: #00cb82;"><i class="fa fa-pencil"></i> Leave a Review</a>
-        </div>
-        <br>
-        <?php foreach ($reviews_query_set as $row) : ?>
-            <div class="card shadow p-3 mb-5 bg-white rounded text-center mx-auto" style="width: 34rem">
-                <h5 class="card-header">
-                    Rating: <?php echo $row['Rating']; ?>
-                    <?php if ($row['User_Name']==$_SESSION['loggedin']) : ?>
-                        <span class="text-right">
-                            <a class="close" href="edit_review.php?reviewID=<?php echo $row['Review_ID'] ?>"><i class="fa fa-pencil"></i></a>
-                        </span>
-                    <?php endif; ?>
-                </h5>
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <?php echo strtoupper($row['Title']); ?>
-                    </h5>
-                    <p class="card-text">
-                        <?php echo $row['Text']; ?>
-                    </p>
-                    <a href="followups.php?reviewID=<?php echo $row['Review_ID'] ?>" class="btn btn-success" style="background: #00cb82;">Follow up</a>
-                </div>
-                <div class="card-footer text-muted">
-                    <?php echo $row['User_Name']; ?>
-                    <?php echo substr($row['Date'], 0, 10); ?>
-                </div>
+    <br>
+    <br>
+    <div class="container shadow p-3 mb-5 bg-white rounded" style="font-family: 'Merriweather', serif;width:34rem">
+        <form action="leave_followup.php?reviewID=<?php echo $review['Review_ID'] ?>" method="post" id="query">
+            <div class="text-center">
+                <label style="color:#00cb82; font-family:Pacifico; font-size:20px;">Leave a Follow-up!</label>
             </div>
-        <?php endforeach; ?>
+            <br>
+            <label>Text</label>
+            <textarea type="text" class="form-control" name="followupText" placeholder="any comments you may have" rows="4" required></textarea>
+            <br>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn" style="background: #00cb82;">Post</button>
+            </div>
+            <br>
+        </form>
     </div>
 </body>
 
