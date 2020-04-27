@@ -525,7 +525,7 @@ function showResultsTable(table) {
         $("div#crimeResults").hide();
         $("div#airlineResults").hide();
         $("div#airlineHistoryResults").hide();
-        $("#div#airbnbHistoryResults").hide();
+        $("div#airbnbHistoryResults").hide();
         $("div#crimeHistoryResults").hide();
         $("div#airbnb").show();
         $("div#airbnbResults").show();
